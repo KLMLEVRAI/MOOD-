@@ -3,6 +3,7 @@
  * Navigation, sliders, Groq AI integration, history, insights, settings.
  */
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import './particles.js';
 
 /* ════════════════════════════════════════════════════════════
    STATE
