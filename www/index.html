@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="MOOD — Capture et analyse ton humeur en temps réel avec une expérience visuelle immersive." />
+  <title>MOOD — Emotional Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&family=SF+Pro+Display:wght@100;200;300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ─── SPLASH SCREEN ─── -->
+  <div id="splash" class="splash">
+    <div class="splash-logo">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <circle cx="32" cy="32" r="18" fill="rgba(255,255,255,0.06)"/>
+        <circle cx="32" cy="32" r="8" fill="rgba(255,255,255,0.15)"/>
+        <circle cx="32" cy="32" r="3" fill="white"/>
+      </svg>
+      <span class="splash-title">MOOD</span>
+    </div>
+    <p class="splash-sub">Emotional Intelligence</p>
+  </div>
+
+  <!-- ─── APP WRAPPER ─── -->
+  <div id="app" class="app hidden">
+
+    <!-- ─── AMBIENT BG ─── -->
+    <div class="ambient-bg" id="ambientBg"></div>
+
+    <!-- ─── NAV ─── -->
+    <nav class="nav-bar" id="navBar">
+      <button class="nav-btn active" id="navHome" data-screen="home" aria-label="Home">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Now</span>
+      </button>
+      <button class="nav-btn" id="navHistory" data-screen="history" aria-label="History">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>History</span>
+      </button>
+      <button class="nav-btn" id="navInsights" data-screen="insights" aria-label="AI Insights">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a10 10 0 1 0 10 10"/>
+          <path d="M12 6v6l4 2"/>
+          <circle cx="18" cy="6" r="3" fill="currentColor" stroke="none" opacity="0.6"/>
+        </svg>
+        <span>Insights</span>
+      </button>
+      <button class="nav-btn" id="navSettings" data-screen="settings" aria-label="Settings">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.07 4.93l-1.41 1.41M4.93 19.07l1.41-1.41M20 12h-2M6 12H4m14.07 7.07l-1.41-1.41M5.34 5.34l1.41 1.41M12 4V2m0 20v-2"/>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <!-- ═══════════════ SCREEN: HOME ═══════════════ -->
+    <section class="screen active" id="screenHome">
+
+      <!-- Header -->
+      <header class="home-header">
+        <div class="greeting" id="greeting">Bonsoir</div>
+        <div class="date-label" id="dateLabel"></div>
+        <button class="save-btn glass-btn" id="saveMoodBtn" aria-label="Enregistrer humeur">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save
+        </button>
+      </header>
+
+      <!-- Particle Canvas -->
+      <div class="canvas-container" id="canvasContainer">
+        <canvas id="particleCanvas"></canvas>
+        <!-- Emotion Label -->
+        <div class="emotion-label" id="emotionLabel">
+          <span class="emotion-name" id="emotionName">Équilibre</span>
+          <span class="emotion-desc" id="emotionDesc">Calme · Stable</span>
+        </div>
+        <!-- AI Insight Bubble -->
+        <div class="ai-insight" id="aiInsight" style="display:none">
+          <div class="ai-dot"></div>
+          <p id="aiInsightText"></p>
+        </div>
+      </div>
+
+      <!-- Emotion Axes Panel -->
+      <div class="axes-panel glass-panel" id="axesPanel">
+        <div class="axes-row">
+          <label class="axis-label">Energie</label>
+          <div class="axis-track" id="trackEnergy">
+            <div class="axis-fill" id="fillEnergy"></div>
+            <div class="axis-thumb" id="thumbEnergy" tabindex="0" role="slider" aria-label="Energie" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></div>
+          </div>
+          <span class="axis-val" id="valEnergy">50</span>
+        </div>
+        <div class="axes-row">
+          <label class="axis-label">Valence</label>
+          <div class="axis-track" id="trackValence">
+            <div class="axis-fill" id="fillValence"></div>
+            <div class="axis-thumb" id="thumbValence" tabindex="0" role="slider" aria-label="Valence" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></div>
+          </div>
+          <span class="axis-val" id="valValence">50</span>
+        </div>
+        <div class="axes-row">
+          <label class="axis-label">Intensité</label>
+          <div class="axis-track" id="trackIntensity">
+            <div class="axis-fill" id="fillIntensity"></div>
+            <div class="axis-thumb" id="thumbIntensity" tabindex="0" role="slider" aria-label="Intensité" aria-valuemin="0" aria-valuemax="100" aria-valuenow="30"></div>
+          </div>
+          <span class="axis-val" id="valIntensity">30</span>
+        </div>
+      </div>
+
+      <!-- Note Input -->
+      <div class="note-section glass-panel" id="noteSection">
+        <div class="note-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <span>Note (optionnel)</span>
+        </div>
+        <textarea id="moodNote" class="mood-note" placeholder="Décris ton état..." rows="2" maxlength="300"></textarea>
+        <button class="analyze-btn glass-btn" id="analyzeBtn" aria-label="Analyser avec IA">
+          <span class="ai-spark">✦</span> Analyser
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════ SCREEN: HISTORY ═══════════════ -->
+    <section class="screen" id="screenHistory">
+      <header class="screen-header">
+        <h1 class="screen-title">Historique</h1>
+        <p class="screen-subtitle">Tes nuages d'humeur passés</p>
+      </header>
+      <div class="history-grid" id="historyGrid">
+        <!-- dynamically populated -->
+      </div>
+      <div class="empty-state" id="historyEmpty">
+        <div class="empty-icon">○</div>
+        <p>Aucune humeur enregistrée encore</p>
+        <span>Capture ton premier moment</span>
+      </div>
+
+      <!-- History Detail Modal -->
+      <div class="modal" id="historyModal" style="display:none">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-sheet glass-panel">
+          <div class="modal-handle"></div>
+          <canvas id="historyCanvas" width="280" height="280"></canvas>
+          <div class="modal-info">
+            <p class="modal-date" id="modalDate"></p>
+            <p class="modal-emotion" id="modalEmotion"></p>
+            <p class="modal-note" id="modalNote"></p>
+            <p class="modal-insight" id="modalInsight"></p>
+          </div>
+          <button class="modal-close glass-btn" id="modalClose">Fermer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ SCREEN: INSIGHTS ═══════════════ -->
+    <section class="screen" id="screenInsights">
+      <header class="screen-header">
+        <h1 class="screen-title">Insights</h1>
+        <p class="screen-subtitle">Intelligence émotionnelle</p>
+      </header>
+
+      <!-- Prediction Card -->
+      <div class="insight-card glass-panel" id="predictionCard">
+        <div class="card-tag">Prédiction IA</div>
+        <canvas id="predictionCanvas" width="120" height="120"></canvas>
+        <div class="card-body">
+          <p class="card-title" id="predictionTitle">Analyse en cours…</p>
+          <p class="card-text" id="predictionText"></p>
+        </div>
+      </div>
+
+      <!-- Pattern Cards -->
+      <div class="patterns-section" id="patternsSection">
+        <h2 class="section-title">Patterns</h2>
+        <div class="patterns-list" id="patternsList">
+          <div class="pattern-item glass-panel" id="patItemTime">
+            <div class="pat-icon">◷</div>
+            <div class="pat-body">
+              <p class="pat-label">Pic d'énergie</p>
+              <p class="pat-val" id="patEnergyPeak">—</p>
+            </div>
+          </div>
+          <div class="pattern-item glass-panel" id="patItemWeek">
+            <div class="pat-icon">◈</div>
+            <div class="pat-body">
+              <p class="pat-label">Meilleur jour</p>
+              <p class="pat-val" id="patBestDay">—</p>
+            </div>
+          </div>
+          <div class="pattern-item glass-panel" id="patItemTrend">
+            <div class="pat-icon">◉</div>
+            <div class="pat-body">
+              <p class="pat-label">Tendance</p>
+              <p class="pat-val" id="patTrend">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Chat -->
+      <div class="ai-chat-section glass-panel" id="aiChatSection">
+        <div class="chat-header">
+          <div class="ai-avatar">✦</div>
+          <span>Parle à MOOD AI</span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg ai-msg">Bonjour. Comment puis-je t'aider à comprendre ton humeur ?</div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" class="chat-input" placeholder="Pose une question…" maxlength="200" />
+          <button class="chat-send glass-btn" id="chatSendBtn" aria-label="Envoyer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ SCREEN: SETTINGS ═══════════════ -->
+    <section class="screen" id="screenSettings">
+      <header class="screen-header">
+        <h1 class="screen-title">Réglages</h1>
+        <p class="screen-subtitle">Personnalise MOOD</p>
+      </header>
+
+      <div class="settings-group glass-panel">
+        <div class="setting-row">
+          <div class="setting-info">
+            <p class="setting-label">Clé Groq API</p>
+            <p class="setting-sub">Pour les analyses IA</p>
+          </div>
+          <div class="setting-control">
+            <input type="password" id="groqApiKey" class="api-input" placeholder="gsk_…" autocomplete="off" />
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <p class="setting-label">Mode sombre</p>
+            <p class="setting-sub">Automatique selon heure</p>
+          </div>
+          <label class="toggle" id="darkModeToggle">
+            <input type="checkbox" id="darkModeCheck" checked />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <p class="setting-label">Notifications douces</p>
+            <p class="setting-sub">Rappels sans pression</p>
+          </div>
+          <label class="toggle" id="notifToggle">
+            <input type="checkbox" id="notifCheck" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <p class="setting-label">Densité particules</p>
+            <p class="setting-sub">Performance vs visuel</p>
+          </div>
+          <select class="setting-select" id="particleDensity">
+            <option value="low">Légère</option>
+            <option value="medium" selected>Normale</option>
+            <option value="high">Dense</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-group glass-panel">
+        <div class="setting-row">
+          <div class="setting-info">
+            <p class="setting-label">Effacer l'historique</p>
+            <p class="setting-sub">Action irréversible</p>
+          </div>
+          <button class="danger-btn" id="clearHistoryBtn">Effacer</button>
+        </div>
+      </div>
+
+      <p class="app-version">MOOD v1.0 · Emotional Intelligence</p>
+    </section>
+
+  </div>
+
+  <!-- ─── TOAST ─── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="particles.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
