@@ -413,4 +413,4 @@ class ParticleEngine {
   }
 }
 
-window.ParticleEngine = ParticleEngine;
+export default ParticleEngine;

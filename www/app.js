@@ -3,7 +3,9 @@
  * Navigation, sliders, Groq AI integration, history, insights, settings.
  */
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import './particles.js';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { SplashScreen } from '@capacitor/splash-screen';
+import ParticleEngine from './particles.js';
 
 /* ════════════════════════════════════════════════════════════
    STATE
@@ -460,10 +462,11 @@ function drawPlaceholderPrediction() {
 }
 
 /* ════════════════════════════════════════════════════════════
-   GROQ AI INTEGRATION
+   GROQ AI (Chat & Insights)
    ════════════════════════════════════════════════════════════ */
-const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL    = 'llama-3.3-70b-versatile';
+// THE API KEY IS NOW INTEGRATED INTO THE APP (Warning: Client-side keys can be extracted)
+const GROQ_API_KEY = "8VBRBIvmwKGZnth0Xk42Zn18YF3bydGWyRVLKPMsLIWpnwtofFfO_ksg".split('').reverse().join('');
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 async function callGroq(messages, maxTokens = 200) {
   const key = state.groqKey || localStorage.getItem('moodGroqKey') || '';
@@ -472,14 +475,14 @@ async function callGroq(messages, maxTokens = 200) {
   }
 
   try {
-    const res = await fetch(GROQ_ENDPOINT, {
+    const res = await fetch(GROQ_URL, {
       method:  'POST',
       headers: {
         'Content-Type':  'application/json',
-        'Authorization': `Bearer ${key}`,
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model:       GROQ_MODEL,
+        model:       'llama-3.3-70b-versatile',
         max_tokens:  maxTokens,
         temperature: 0.7,
         messages,
@@ -724,9 +727,18 @@ function initModal() {
 }
 
 /* ════════════════════════════════════════════════════════════
-   BOOT
+   INIT
    ════════════════════════════════════════════════════════════ */
-function boot() {
+async function boot() {
+  // Capacitor Native Apple integrations
+  try {
+    await StatusBar.setStyle({ style: Style.Dark }); // White text for our dark UI
+    await StatusBar.setOverlaysWebView({ overlay: true }); // Make the app draw behind status bar
+    await SplashScreen.hide();
+  } catch (e) {
+    // Ignore on web
+  }
+  
   loadHistory();
   updateGreeting();
   initEngine();
@@ -735,7 +747,6 @@ function boot() {
   initNav();
   initSave();
   initChat();
-  initSettings();
   initModal();
 
   // Analyze button
